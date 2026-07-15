@@ -1,0 +1,32 @@
+# ==========================================================================
+#  ANONYMISATION — NE JAMAIS PUBLIER
+#  Fichiers de travail internes : contexte projet, contiennent des
+#  références réelles (client / marques). Exclus du dépôt public.
+# ==========================================================================
+CLAUDE.md
+BRIEF.md
+WORKLOG.md
+progetto-input.md
+F2-modello-powerbi.md
+F3-checklist-misure.md
+F4-dashboard.md
+F5-publication.md
+
+# ==========================================================================
+#  Python
+# ==========================================================================
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# ==========================================================================
+#  OS / Office / Power BI (fichiers temporaires)
+# ==========================================================================
+.DS_Store
+Thumbs.db
+desktop.ini
+~$*
+*.tmp
+*.pbix.bak

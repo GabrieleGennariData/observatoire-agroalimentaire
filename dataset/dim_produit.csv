@@ -1,0 +1,13 @@
+code_produit,libelle,categorie,marque,pole
+P001,Poulet entier,Volaille brute,Marque A,Volaille
+P002,Cuisse de poulet,Decoupe,Marque B,Volaille
+P003,Filet de poulet,Decoupe,Marque B,Volaille
+P004,Escalope de dinde,Decoupe,Marque C,Volaille
+P005,Nuggets de poulet,Elabore,Marque C,Volaille
+P006,Cordon bleu,Elabore,Marque B,Volaille
+P007,Magret de canard,Decoupe,Marque A,Volaille
+P008,Quiche lorraine,Traiteur,Marque D,Traiteur
+P009,Plat asiatique,Traiteur,Marque E,Traiteur
+P010,Pizza jambon fromage,Traiteur,Marque D,Traiteur
+P011,Oeufs plein air x6,Oeufs,Marque F,Traiteur
+P012,Saucisse de volaille,Elabore,Marque B,Volaille

@@ -1,0 +1,161 @@
+DEFINE
+
+    MEASURE _Mesures[CA Total] =
+        SUM ( fact_ventes[CA] )
+
+    MEASURE _Mesures[Coût Total] =
+        SUM ( fact_ventes[cout] )
+
+    MEASURE _Mesures[Marge] =
+        [CA Total] - [Coût Total]
+
+    MEASURE _Mesures[Taux de Marge %] =
+        DIVIDE ( [Marge], [CA Total] )
+
+    MEASURE _Mesures[Quantité Vendue] =
+        SUM ( fact_ventes[quantite] )
+
+    MEASURE _Mesures[Nb Transactions] =
+        COUNTROWS ( fact_ventes )
+
+    MEASURE _Mesures[Prix de Vente Moyen] =
+        DIVIDE ( [CA Total], [Quantité Vendue] )
+
+    MEASURE _Mesures[Rang Produit (CA)] =
+        IF (
+            HASONEVALUE ( dim_produit[libelle] ),
+            RANKX (
+                ALLSELECTED ( dim_produit[libelle] ),
+                [CA Total],
+                ,
+                DESC,
+                DENSE
+            )
+        )
+
+    MEASURE _Mesures[Stock Qté] =
+        LASTNONBLANKVALUE (
+            dim_date[Date],
+            SUM ( fact_stocks[stock_qte] )
+        )
+
+    MEASURE _Mesures[Valeur Stock] =
+        LASTNONBLANKVALUE (
+            dim_date[Date],
+            SUM ( fact_stocks[stock_valeur] )
+        )
+
+    MEASURE _Mesures[Nb Lignes Stock] =
+        COUNTROWS ( fact_stocks )
+
+    MEASURE _Mesures[Nb Ruptures] =
+        CALCULATE (
+            COUNTROWS ( fact_stocks ),
+            fact_stocks[stock_qte] = 0
+        )
+
+    MEASURE _Mesures[Taux de Rupture %] =
+        DIVIDE ( [Nb Ruptures], [Nb Lignes Stock] )
+
+    MEASURE _Mesures[Ventes Moy Jour (Qté)] =
+        DIVIDE (
+            [Quantité Vendue],
+            DISTINCTCOUNT ( fact_ventes[date] )
+        )
+
+    MEASURE _Mesures[Couverture Stock (jours)] =
+        DIVIDE ( [Stock Qté], [Ventes Moy Jour (Qté)] )
+
+    MEASURE _Mesures[Stock Moyen Valorisé] =
+        AVERAGEX (
+            VALUES ( dim_date[Date] ),
+            CALCULATE ( SUM ( fact_stocks[stock_valeur] ) )
+        )
+
+    MEASURE _Mesures[Rotation de Stock] =
+        DIVIDE ( [Coût Total], [Stock Moyen Valorisé] )
+
+    MEASURE _Mesures[Qté Produite] =
+        SUM ( fact_production[qte_produite] )
+
+    MEASURE _Mesures[Qté Rebut] =
+        SUM ( fact_production[qte_rebut] )
+
+    MEASURE _Mesures[Taux de Rebut %] =
+        DIVIDE ( [Qté Rebut], [Qté Produite] )
+
+    MEASURE _Mesures[Qté Produite Nette] =
+        [Qté Produite] - [Qté Rebut]
+
+    MEASURE _Mesures[Ratio Production / Ventes] =
+        DIVIDE ( [Qté Produite Nette], [Quantité Vendue] )
+
+    MEASURE _Mesures[Écart Taux de Rebut vs Moy. Usines] =
+        VAR TauxUsine = [Taux de Rebut %]
+        VAR TauxMoyenToutesUsines =
+            CALCULATE ( [Taux de Rebut %], REMOVEFILTERS ( dim_usine ) )
+        RETURN
+            TauxUsine - TauxMoyenToutesUsines
+
+    MEASURE _Mesures[CA N-1] =
+        VAR PremiereDateModele =
+            CALCULATE ( MIN ( dim_date[Date] ), REMOVEFILTERS ( dim_date ) )
+        VAR DebutN1 =
+            EDATE ( MIN ( dim_date[Date] ), -12 )
+        RETURN
+            IF (
+                DebutN1 >= PremiereDateModele,
+                CALCULATE (
+                    [CA Total],
+                    SAMEPERIODLASTYEAR ( dim_date[Date] )
+                )
+            )
+
+    MEASURE _Mesures[Écart CA YoY %] =
+        VAR CAN1 = [CA N-1]
+        RETURN
+            DIVIDE ( [CA Total] - CAN1, CAN1 )
+
+    MEASURE _Mesures[CA YTD] =
+        TOTALYTD ( [CA Total], dim_date[Date] )
+
+    MEASURE _Mesures[CA YTD N-1] =
+        CALCULATE (
+            [CA YTD],
+            SAMEPERIODLASTYEAR ( dim_date[Date] )
+        )
+
+    MEASURE _Mesures[Croissance CA YTD %] =
+        VAR YTD_N = [CA YTD]
+        VAR YTD_N1 = [CA YTD N-1]
+        RETURN
+            DIVIDE ( YTD_N - YTD_N1, YTD_N1 )
+
+    MEASURE _Mesures[CA MAT (12 mois glissants)] =
+        CALCULATE (
+            [CA Total],
+            DATESINPERIOD (
+                dim_date[Date],
+                MAX ( dim_date[Date] ),
+                -12,
+                MONTH
+            )
+        )
+
+    MEASURE _Mesures[Taux de Rebut % N-1] =
+        CALCULATE (
+            [Taux de Rebut %],
+            SAMEPERIODLASTYEAR ( dim_date[Date] )
+        )
+
+EVALUATE
+    ROW (
+        "CA Total", [CA Total],
+        "Coût Total", [Coût Total],
+        "Taux de Marge %", [Taux de Marge %],
+        "Taux de Rupture %", [Taux de Rupture %],
+        "Taux de Rebut %", [Taux de Rebut %],
+        "CA N-1", [CA N-1],
+        "Écart CA YoY %", [Écart CA YoY %],
+        "Croissance CA YTD %", [Croissance CA YTD %]
+    )
