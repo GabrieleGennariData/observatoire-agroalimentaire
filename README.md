@@ -10,7 +10,6 @@ C'est un projet portfolio. Il met en avant un modèle en étoile propre, une bib
 |---|---|---|
 | ![Page Finance](docs/img/01-finance.png) | ![Page Supply Chain](docs/img/02-supply-chain.png) | ![Page Production](docs/img/03-production.png) |
 
-Le tableau de bord interactif en ligne sera accessible ici : *(lien « Publier sur le web » à venir)*
 
 ## Ce que montre le tableau de bord
 
